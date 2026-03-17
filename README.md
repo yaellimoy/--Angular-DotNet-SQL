@@ -1,73 +1,48 @@
-# TaskManagement-Angular-DotNet-SQL
-Full Stack Task Management System using Angular, .NET Web API and SQL Server Stored Procedures
-# מערכת ניהול משימות
+מערכת SmartTask - ניהול פרויקטים ומטלות
+אפליקציית Full-Stack מתקדמת לארגון ומעקב אחר משימות, המבוססת על Angular בסינכרון עם .NET Web API ופרוצדורות במסד נתונים SQL Server.
 
-## 1. נושא הפרויקט
-מערכת לניהול משימות עם אפשרות ליצירה, עריכה, צפייה ומחיקה של משימות.
-המערכת מאפשרת ארגון משימות לפי סטטוס וקטגוריה, עם מעקב אחר תאריכי יצירה ויעד.
+1. אודות הפרויקט
+האפליקציה נועדה לסייע למשתמשים לנהל את סדר היום שלהם בצורה יעילה. היא מאפשרת לבצע פעולות CRUD מלאות (יצירה, הצגה, עריכה והסרה), תוך סיווג המטלות לפי רמות דחיפות וסטטוס ביצוע, עם דגש על עמידה בלוחות זמנים.
 
-## 2. תיאור הטבלאות והקשרים
+2. ארכיטקטורת נתונים (ERD)
+המערכת מבוססת על 3 ישויות מרכזיות:
 
-### טבלאות:
+מטלות (Tasks): טבלת הליבה הכוללת כותרת, פירוט המטלה, תאריכי יצירה ויעד, וקישורים לישויות הסיווג.
 
-**Tasks (טבלה ראשית)**
-- Id - מזהה ייחודי (מפתח ראשי)
-- Title - כותרת המשימה
-- Description - תיאור המשימה
-- StatusId - מזהה סטטוס (מפתח זר ל-Statuses)
-- CategoryId - מזהה קטגוריה (מפתח זר ל-Categories)
-- CreatedAt - תאריך יצירה
-- DueDate - תאריך יעד
+מצבי ביצוע (TaskStatuses): מגדירה את שלב המשימה (ממתינה, בביצוע, הסתיימה).
 
-**Statuses (טבלת סטטוסים)**
-- Id - מזהה ייחודי (מפתח ראשי)
-- Name - שם הסטטוס (חדש, בתהליך, הושלם)
+סיווגים (TaskTypes): קטלוג המשימה לפי תחומים (כגון: עבודה, פיתוח, דחוף).
 
-**Categories (טבלת קטגוריות)**
-- Id - מזהה ייחודי (מפתח ראשי)
-- Name - שם הקטגוריה (עבודה, אישי, דחוף)
+קשרי גומלין: טבלת המטלות מחזיקה מפתחות זרים (Foreign Keys) המקשרים כל שורה לסטטוס ולסוג המתאים לה.
 
-### קשרים:
-- Tasks.StatusId → Statuses.Id (Foreign Key)
-- Tasks.CategoryId → Categories.Id (Foreign Key)
+3. לוגיקה במסד הנתונים (Stored Procedures)
+כל התקשורת מול ה-DB מתבצעת דרך פרוצדורות שמורות לשמירה על ביצועים ואבטחה:
 
-## 3. רשימת Stored Procedures
+sp_AddNewTask - הוספת רשומה חדשה.
 
-1. **Tasks_Create** - יצירת משימה חדשה
-2. **Tasks_Update** - עדכון משימה קיימת
-3. **Tasks_GetById** - שליפת משימה לפי מזהה (כולל JOIN לשמות ידידותיים)
-4. **Tasks_GetAll** - שליפת כל המשימות (כולל JOIN)
-5. **Tasks_Delete** - מחיקת משימה
-6. **Statuses_GetAll** - שליפת כל הסטטוסים
-7. **Categories_GetAll** - שליפת כל הקטגוריות
+sp_ModifyTask - עדכון נתוני משימה קיימת.
 
-## 4. הרצת הפרויקט
+sp_RemoveTask - מחיקה מהמערכת.
 
-### מסד נתונים:
-1. פתח SQL Server Management Studio
-2. התחבר לשרת: `MININT-OUNN1FJ\SQLEXPRESS`
-3. הרץ את הסקריפט ליצירת מסד הנתונים והטבלאות
-4. הרץ את כל ה-Stored Procedures
-5. הרץ את additional-procedures.sql להוספת נתוני דוגמה
+sp_FetchAllTasks - שליפה מרוכזת של כלל הנתונים בעזרת Joins.
 
-### צד שרת (.NET API):
-1. פתח את הפרויקט ב-Visual Studio
-2. ודא שמחרוזת החיבור ב-appsettings.json נכונה:
-   ```
-   Server=MININT-OUNN1FJ\\SQLEXPRESS;Database=TaskManagement;Integrated Security=True;TrustServerCertificate=True;Encrypt=False;
-   ```
-3. הרץ את הפרויקט (F5)
-4. ה-API ירוץ על: http://localhost:5258
+sp_GetTaskDetails - שליפת מידע ספציפי לפי מזהה.
 
-### צד לקוח (Angular):
-1. פתח terminal בתיקיית client
-2. הרץ: `npm install` (פעם ראשונה בלבד)
-3. הרץ: `ng serve`
-4. פתח דפדפן בכתובת: http://localhost:4200
+sp_LoadLookups - טעינת רשימות הסטטוסים והסיווגים לטפסי המערכת.
 
-## מסכים במערכת
+4. הנחיות להרצה מקומית
+הגדרת ה-Backend:
 
-1. **מסך רשימה** (/tasks) - הצגת כל המשימות עם חיפוש וכפתורי פעולה
-2. **מסך יצירה/עריכה** (/tasks/new, /tasks/edit/:id) - טופס Reactive Forms
-3. **מסך פרטים** (/tasks/:id) - הצגת כל פרטי המשימה
+פתחי את קובץ ה-SLN ב-Visual Studio.
 
+עדכני ב-appsettings.json את ה-Connection String לשרת המקומי שלך (לפי השם שמופיע לך ב-SSMS).
+
+הריצי את סקריפטי ה-SQL המצורפים ליצירת המבנה והפרוצדורות.
+
+הגדרת ה-Frontend:
+
+נווט לתיקיית ה-Client דרך ה-Terminal.
+
+הריצי npm install להתקנת התלויות.
+
+הריצי ng serve להפעלת ממשק המשתמש (זמין בכתובת localhost:4200).
